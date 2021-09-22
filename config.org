@@ -46,8 +46,9 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 (use-package general
   :config 
   (general-evil-setup t)
-  (general-evil-define-key 'normal 'global
-    :prefix "SPC"))
+  (general-evil-define-key 'normal 'global :prefix "SPC"))
+
+(general-create-definer my-leader-def :states '(normal visual) :keymaps 'override :prefix "SPC")
 
 ;; Exit insert mode by pressing j and then k quickly
 (use-package key-chord)
@@ -72,6 +73,11 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes))
 #+end_src
 * General
+** General Unbindings
+#+begin_src emacs-lisp
+;; I need C-k
+(global-unset-key (kbd "C-k"))
+#+end_src
 ** Garbage Collection
 #+begin_src emacs-lisp
 ;; Using garbage magic hack.
@@ -120,7 +126,7 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 (use-package switch-window)
 
 (winner-mode 1)
-(nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
+(my-leader-def
   "w" '(:ignore t :which-key "Window")
   ;; Window splits
   "w d"   '(evil-window-delete :which-key "Close window")
@@ -139,25 +145,13 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 #+end_src
 ** Code Evaluation
 #+begin_src emacs-lisp
-(nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
+(my-leader-def
   "e" '(:ignore t :which-key "Evaluate")
   "e b"   '(eval-buffer :which-key "Eval elisp in buffer")
   "e d"   '(eval-defun :which-key "Eval defun")
   "e e"   '(eval-expression :which-key "Eval elisp expression")
   "e l"   '(eval-last-sexp :which-key "Eval last sexpression")
   "e r"   '(eval-region :which-key "Eval region")) 
-#+end_src
-** Buffers
-#+begin_src emacs-lisp
-;; buffers
-(nvmap :prefix "SPC"
-       "b b"   '(ibuffer :which-key "Ibuffer")
-       "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
-       "b k"   '(kill-current-buffer :which-key "Kill current buffer")
-       "b n"   '(next-buffer :which-key "Next buffer")
-       "b p"   '(previous-buffer :which-key "Previous buffer")
-       "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
-       "b K"   '(kill-buffer :which-key "Kill buffer"))
 #+end_src
 ** Scrolling
 #+begin_src emacs-lisp
@@ -166,17 +160,35 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 (setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 #+end_src
+*** Buffers
+#+begin_src emacs-lisp
+;; buffers
+(my-leader-def
+  "b"     '(:ignore t :which-key "Buffer")
+  "b b"   '(ibuffer :which-key "Ibuffer")
+  "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
+  "b k"   '(kill-current-buffer :which-key "Kill current buffer")
+  "b n"   '(next-buffer :which-key "Next buffer")
+  "b p"   '(previous-buffer :which-key "Previous buffer")
+  "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
+  "b K"   '(kill-buffer :which-key "Kill buffer"))
+#+end_src
 * Dired
 #+begin_src emacs-lisp
 (use-package all-the-icons-dired)
 (use-package dired-open)
 (use-package peep-dired)
 
-(nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
-  "d"   '(:ignore t :which-key "Dired")
-  "d d" '(dired :which-key "Open dired")
-  "d j" '(dired-jump :which-key "Dired jump to current")
-  "d p" '(peep-dired :which-key "Peep-dired"))
+(use-package dired
+  :straight nil
+  :config
+  (my-leader-def 
+    "d"   '(:ignore t :which-key "Dired")
+    "d d" '(dired :which-key "Open dired")
+    "d j" '(dired-jump :which-key "Dired jump to current")
+    "d p" '(peep-dired :which-key "Peep-dired")
+    "d o" '(dired-omit-mode :which-key "Hide files")))
+
 
 (with-eval-after-load 'dired
   ;;(define-key dired-mode-map (kbd "M-p") 'peep-dired)
@@ -195,15 +207,6 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
                               ("png" . "sxiv")
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
-#+end_src
-
-* Org
-#+begin_src emacs-lisp
-(setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
-
-(nvmap :states '(normal) :keymaps 'override :prefix "SPC"
-  "o"   '(:ignore t :which-key "Org")
-  "o l" '(org-insert-link :which-key "Insert Link"))
 #+end_src
 
 * Which Key
@@ -229,7 +232,8 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 #+begin_src emacs-lisp
 (use-package sudo-edit
   :config
-  (nvmap :states '(normal visual) :keymaps 'override :prefix "SPC"
+  (my-leader-def 
+    "f"     '(:ignore t :which-key "Files")
     "."     '(find-file :which-key "Find file")
     "f f"   '(find-file :which-key "Find file")
     "f r"   '(counsel-recentf :which-key "Recent files")
@@ -245,11 +249,22 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 
 * Org
 #+begin_src emacs-lisp
+(setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
+
+(my-leader-def
+  "o"   '(:ignore t :which-key "Org")
+  "o l" '(org-insert-link :which-key "Insert Link"))
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package org
   :hook (org-mode . org-indent-mode)
   :bind (("M-k" . org-move-subtree-up)
-         ("M-j" . org-move-subtree-down))
+         ("M-j" . org-move-subtree-down)
+         ("M-h" . org-promote-subtree)
+         ("M-l" . org-demote-subtree))
   :config
+  (define-key org-mode-map (kbd "M-h") #'org-promote-subtree) ;; have to override this in the major mode map
   (setq org-ellipsis "…"
 	org-hide-emphasis-markers t
 	org-journal-date-format "%B %d, %Y (%A) "
@@ -257,23 +272,31 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 	org-src-preserve-indentation nil
 	org-src-tab-acts-natively t
 	org-edit-src-content-indentation 0
-	org-directory "~/Org/"
-	org-agenda-files '("~/Org/agenda.org")
-	org-default-notes-file (expand-file-name "notes.org" org-directory))
-     
-  )
+	org-directory "~/org/"
+	org-agenda-files '("~/org/agenda.org")
+	org-default-notes-file (expand-file-name "notes.org" org-directory)))
+
+
 
 ;; (use-package org-bullets
 ;;   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
 (require 'org-tempo nil t)
 #+end_src
-** Source Blocks
+*** Source Blocks
 #+begin_src emacs-lisp
-(setq org-src-fontify-natively t
-    org-src-tab-acts-natively t
-    org-confirm-babel-evaluate nil
-    org-edit-src-content-indentation 0)
+  (setq org-src-fontify-natively t
+	org-src-tab-acts-natively t
+	org-confirm-babel-evaluate nil
+	org-edit-src-content-indentation 0)
+
+  ;; auto indent
+  (defun indent-org-block-automatically ()
+    (interactive 
+     (when (org-in-src-block-p)
+       (org-edit-special)
+       (indent-region (point-min) (point-max))
+       (org-edit-src-exit))))
 #+end_src
 * Ivy (Counsel/Swiper)
 #+begin_src emacs-lisp
@@ -286,16 +309,16 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
   :diminish
   :bind
   (("C-c C-r" . ivy-resume)
-   ("C-x B" . ivy-switch-buffer-other-window)
-   ("C-j" . ivy-next-line)
-   ("C-k" . ivy-previous-line))
+   ("C-x B" . ivy-switch-buffer-other-window))
   :custom
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-use-virtual-buffers t)
   (setq enable-recursive-minibuffers t)
   :config
   (ivy-mode)
-  (setq ivy-initial-inputs-alist nil))
+  (setq ivy-initial-inputs-alist nil)
+  (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
+  (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line))
 (use-package ivy-rich
   :after ivy
   :custom
@@ -338,7 +361,7 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 #+end_src
 * Eshell
 #+begin_src emacs-lisp
-(nvmap :prefix "SPC"
+(my-leader-def 
        "e h"   '(counsel-esh-history :which-key "Eshell history")
        "e s"   '(eshell :which-key "Eshell"))
 #+end_src
@@ -359,13 +382,18 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
       eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
 #+end_src
 * Writeroom
-Let's bind this to a key...
 #+begin_src emacs-lisp
-(use-package writeroom-mode)
+(use-package writeroom-mode
+  :config (my-leader-def "w C-w" '(writeroom-mode :which-key "Toggle writeroom")))
 #+end_src
 * Magit
 #+begin_src emacs-lisp
-(use-package magit)
+(use-package magit
+  :hook (magit-mode . (lambda () ()))
+  :config
+  (my-leader-def 
+    "g" '(:ignore t :which-key "Magit")
+    "g s" '(magit-status :which-key "status")))
 #+end_src
 * Dashboard
 #+begin_src emacs-lisp
@@ -373,7 +401,7 @@ Let's bind this to a key...
   :init      ;; tweak dashboard config before loading it
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
-  (setq dashboard-banner-logo-title "God damn you look good today.")
+  (setq dashboard-banner-logo-title "Wow you look good today.")
   (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
   ;;(setq dashboard-startup-banner "~/.emacs.d/emacs-dash.png")  ;; use custom image as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
@@ -388,4 +416,66 @@ Let's bind this to a key...
 			      (bookmarks . "book"))))
 
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; emacs client should always open dashboard
+#+end_src
+* Autopair
+Not working quite as I would like it to.
+#+begin_src emacs-lisp
+;; (use-package autopair
+;;   :config
+;;   (autopair-global-mode))
+#+end_src
+* Language Support
+#+begin_src emacs-lisp
+(use-package groovy-mode)
+#+end_src>
+* Projectile 
+#+begin_src emacs-lisp
+(use-package projectile
+  :config
+  (my-leader-def
+    "p"   '(:ignore t :which-key "Projectile")
+    "p f" '(projectile-find-file :which-key "Find file")
+    "p p" '(projectile-switch-project :which-key "Switch projects"))
+  (setq projectile-completion-system 'ivy))
+#+end_src
+* Lsp
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  ;; (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp-deffered)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp lsp-deffered
+  :bind ())
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+(use-package flycheck)
+
+#+end_src
+** Python
+#+begin_src emacs-lisp
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred))))  ; or lsp-deferred
+#+end_src
+* Company
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'global-company-mode)
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-k") #'company-select-previous)
+  (define-key company-active-map (kbd "C-j") #'company-select-next))
 #+end_src
