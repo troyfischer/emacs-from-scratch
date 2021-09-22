@@ -173,6 +173,12 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
   "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
   "b K"   '(kill-buffer :which-key "Kill buffer"))
 #+end_src
+** Hide Custom File
+#+begin_src emacs-lisp
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+#+end_src
 * Dired
 #+begin_src emacs-lisp
 (use-package all-the-icons-dired)
