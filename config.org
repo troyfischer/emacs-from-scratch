@@ -516,7 +516,7 @@ Be careful-ish about deleting files.
   (general-evil-define-key 'normal magit-mode-map (kbd "p") 'magit-push)
   (general-evil-define-key 'normal magit-mode-map (kbd "P") 'magit-pull)
   (general-evil-define-key 'normal magit-mode-map (kbd "f") 'magit-fetch)
-  (general-evil-define-key 'normal magit-mode-map (kbd "zz") 'with-editor-finish)
+  ;;(general-evil-define-key 'normal text-mode-map (kbd "zz") 'with-editor-finish)
   (my-leader-def 
     "g" '(:ignore t :which-key "Magit")
     "g s" '(magit-status :which-key "status")
