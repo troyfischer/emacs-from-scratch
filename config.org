@@ -429,24 +429,6 @@ Be careful-ish about deleting files.
   (setq ivy-initial-inputs-alist nil)
   (ivy-mode 1))
 
-;; (use-package ivy
-;;   :defer 0.1
-;;   :diminish
-;;   :bind
-;;   (("C-c C-r" . ivy-resume)
-;;    ("C-x B" . ivy-switch-buffer-other-window))
-;;   :custom
-;;   (setq ivy-count-format "(%d/%d) ")
-;;   (setq ivy-use-virtual-buffers t)
-;;   (setq enable-recursive-minibuffers t)
-;;   :config
-;;   (ivy-mode)
-;;   (setq ivy-initial-inputs-alist nil)
-;;   (general-evil-define-key '(normal insert) ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
-;;   (general-evil-define-key '(normal insert) ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
-;;   (general-evil-define-key '(normal insert) ivy-minibuffer-map (kbd "C-l") 'ivy-alt-done)
-;;   (general-evil-define-key '(normal insert) ivy-minibuffer-map (kbd "C-h") 'delete-backward-char))
-
 (use-package ivy-rich
   :after ivy
   :custom
@@ -457,6 +439,7 @@ Be careful-ish about deleting files.
   (ivy-set-display-transformer 'ivy-switch-buffer
                                'ivy-rich-switch-buffer-transformer)
   (ivy-rich-mode 1)) ;; this gets us descriptions in M-x.
+
 (use-package swiper
   :after ivy
   :bind (("C-s" . swiper)))
@@ -533,6 +516,7 @@ Be careful-ish about deleting files.
   (general-evil-define-key 'normal magit-mode-map (kbd "p") 'magit-push)
   (general-evil-define-key 'normal magit-mode-map (kbd "P") 'magit-pull)
   (general-evil-define-key 'normal magit-mode-map (kbd "f") 'magit-fetch)
+  (general-evil-define-key 'normal magit-mode-map (kbd "zz") 'with-editor-finish)
   (my-leader-def 
     "g" '(:ignore t :which-key "Magit")
     "g s" '(magit-status :which-key "status")
@@ -650,4 +634,3 @@ Not working quite as I would like it to.
 #+begin_src emacs-lisp
 (use-package emacs-everywhere)
 #+end_src
-
