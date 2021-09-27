@@ -233,9 +233,10 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
   (key-chord-mode 1))
 
 ;; redo system
-(use-package undo-fu)
-(define-key evil-normal-state-map "u" 'undo-fu-only-undo)
-(define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo)
+(use-package undo-fu
+  :config
+  (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
+  (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
 #+end_src
 ** Keybindings
 Package for binding keys when using evil.
@@ -250,6 +251,8 @@ Package for binding keys when using evil.
 
 (my-leader-def
   ":" '(execute-extended-command :which-key "Command"))
+
+(define-key minibuffer-local-map (kbd "C-p") 'clipboard-yank)
 #+end_src
 ** Window Movement
 #+begin_src emacs-lisp
@@ -371,7 +374,7 @@ Package for binding keys when using evil.
     "f r"   '(counsel-recentf :which-key "Recent files")
     "f s"   '(save-buffer :which-key "Save file")
     "f u"   '(sudo-edit-find-file :which-key "Sudo find file")
-    "f y"   '(dt/show-and-copy-buffer-path :which-key "Yank file path")
+    ;;"f y"   '(dt/show-and-copy-buffer-path :which-key "Yank file path")
     "f C"   '(copy-file :which-key "Copy file")
     "f D"   '(delete-file :which-key "Delete file")
     "f R"   '(rename-file :which-key "Rename file")
@@ -564,9 +567,9 @@ Package for binding keys when using evil.
   (setq dashboard-projects-backend 'projectile)
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
-  (setq dashboard-banner-logo-title "Wow you look good today.")
-  (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  ;;(setq dashboard-startup-banner "~/.emacs.d/emacs-dash.png")  ;; use custom image as banner
+  (setq dashboard-banner-logo-title "Emacs saves lives.")
+  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  (setq dashboard-startup-banner "~/.emacs.d/emacs-e.svg")  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
