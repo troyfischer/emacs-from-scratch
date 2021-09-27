@@ -192,11 +192,35 @@ Package for binding keys when using evil.
 #+begin_src emacs-lisp
 ;; Doom themes
 (use-package doom-themes)
-(load-theme 'doom-dracula t)
+(load-theme 'doom-Iosvkem t)
 
 ;; Doom modeline
 (use-package doom-modeline)
 (doom-modeline-mode 1)
+#+end_src
+*** Font
+Run ~fc-list~ to view available fonts.
+#+begin_src emacs-lisp
+;; Set the font face based on platform
+(when (or IS-LINUX IS-WINDOWS)
+    (set-face-attribute 'default nil
+                    :font "JetBrainsMono Nerd Font"
+                    :weight 'light
+                    :height 140))
+
+(when IS-MAC (set-face-attribute 'default nil :font "Fira Mono" :height 150))
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil
+                    :font "JetBrainsMono Nerd Font"
+                    :weight 'light
+                    :height 140)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil
+                    :font "Ubuntu Mono"
+                    :height 140
+                    :weight 'light)
 #+end_src
 ** Line Numbering
 #+begin_src emacs-lisp
@@ -354,15 +378,8 @@ Be careful-ish about deleting files.
 #+end_src
 * Org
 #+begin_src emacs-lisp
-(setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
-
-(my-leader-def
-  "o"   '(:ignore t :which-key "Org")
-  "o l" '(org-insert-link :which-key "Insert Link"))
-#+end_src
-
-#+begin_src emacs-lisp
 (use-package org
+  :straight nil
   :hook (org-mode . org-indent-mode)
   :bind (("M-k" . org-move-subtree-up)
          ("M-j" . org-move-subtree-down)
@@ -378,30 +395,41 @@ Be careful-ish about deleting files.
 	org-src-tab-acts-natively t
 	org-edit-src-content-indentation 0
 	org-directory "~/org/"
-	org-agenda-files '("~/org/agenda.org")
+	org-agenda-files (expand-file-name "agenda.org" org-directory)
 	org-default-notes-file (expand-file-name "notes.org" org-directory)))
-
-
 
 ;; (use-package org-bullets
 ;;   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
 (require 'org-tempo nil t)
 #+end_src
+
+#+begin_src emacs-lisp
+(setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
+
+(my-leader-def
+  "o"   '(:ignore t :which-key "Org")
+  "o l" '(org-insert-link :which-key "Insert Link"))
+#+end_src
+
 *** Source Blocks
 #+begin_src emacs-lisp
-  (setq org-src-fontify-natively t
-	org-src-tab-acts-natively t
-	org-confirm-babel-evaluate nil
-	org-edit-src-content-indentation 0)
+(setq org-src-fontify-natively t
+      org-src-tab-acts-natively t
+      org-confirm-babel-evaluate nil
+      org-edit-src-content-indentation 0)
 
-  ;; auto indent
-  (defun indent-org-block-automatically ()
-    (interactive 
-     (when (org-in-src-block-p)
-       (org-edit-special)
-       (indent-region (point-min) (point-max))
-       (org-edit-src-exit))))
+(setq org-babel-load-languages '((emacs-lisp . t)
+                                 (python . t)
+                                 (groovy . t)))
+
+;; auto indent
+(defun indent-org-block-automatically ()
+  (interactive 
+   (when (org-in-src-block-p)
+     (org-edit-special)
+     (indent-region (point-min) (point-max))
+     (org-edit-src-exit))))
 #+end_src
 * Ivy (Counsel/Swiper)
 #+begin_src emacs-lisp
@@ -468,7 +496,6 @@ Be careful-ish about deleting files.
 (use-package smex
  :config
  (smex-initialize))
-
 #+end_src
 * Hydra
 #+begin_src emacs-lisp
@@ -558,18 +585,6 @@ Be careful-ish about deleting files.
 
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; emacs client should always open dashboard
 #+end_src
-* Autopair
-Not working quite as I would like it to.
-#+begin_src emacs-lisp
-;; (use-package autopair
-;;   :config
-;;   (autopair-global-mode))
-#+end_src
-* Language Support
-#+begin_src emacs-lisp
-(use-package groovy-mode)
-(use-package python-mode)
-#+end_src>
 * Projectile 
 #+begin_src emacs-lisp
 (use-package projectile
@@ -577,8 +592,29 @@ Not working quite as I would like it to.
   (my-leader-def
     "p"   '(:ignore t :which-key "Projectile")
     "p f" '(projectile-find-file :which-key "Find file")
-    "p p" '(projectile-switch-project :which-key "Switch projects"))
+    "p p" '(projectile-switch-project :which-key "Switch projects")
+    "p g" '(projectile-grep :which-key "Grep"))
   (setq projectile-completion-system 'ivy))
+#+end_src
+* Language Support
+#+begin_src emacs-lisp
+(use-package groovy-mode)
+#+end_src
+** Python
+I always work from python virtual environments.
+#+begin_src emacs-lisp
+(use-package pyvenv
+  :ensure t
+  :config
+  (pyvenv-mode t)
+
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
 #+end_src
 * Lsp
 #+begin_src emacs-lisp
@@ -587,14 +623,21 @@ Not working quite as I would like it to.
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   ;; (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (python-mode . lsp-deffered)
+         (python-mode . lsp-deferred)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp lsp-deffered
-  :bind ())
+  :commands lsp lsp-deferred
+  :bind ()
+  :config
+  (setq lsp-prefer-capf t)
+  (my-leader-def
+    "l" '(:ignore t :which-key "Lsp")
+    "l d" '(lsp-find-definition :which-key "Find definition")
+    "l r" '(lsp-rename :which-key "Rename")))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
+
 ;; if you are an ivy user
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
@@ -605,6 +648,76 @@ Not working quite as I would like it to.
 
 (use-package flycheck)
 #+end_src
+** Company
+#+begin_src emacs-lisp
+;; (use-package company
+;;   :after lsp-mode
+;;   :hook (lsp-mode . company-mode)
+;;   :bind (:map company-active-map
+;;          ("<tab>" . company-complete-selection)
+;; 	 ("C-l" . company-complete-selection))
+;;         (:map lsp-mode-map
+;;          ("<tab>" . company-indent-or-complete-common)
+;;          ("C-l" . company-complete-selection))
+;;   :custom
+;;   (company-minimum-prefix-length 1)
+;;   (company-idle-delay 0.01)
+;;   :config
+;;     ;; (setq company-frontends '(company-pseudo-tooltip-frontend
+;;     ;;                         company-echo-metadata-frontend))
+;;   ;; (setq company-frontends '(company-pseudo-tooltip-frontend))
+;;   (setq company-frontends '(company-preview-frontend company-echo-metadata-frontend))
+;; )
+
+(use-package company
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection)
+	 ("C-l" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common)
+         ("C-l" . company-complete-selection))
+  :commands (company-complete-common
+             company-complete-common-or-cycle
+             company-manual-begin
+             company-grab-line)
+  :hook (lsp-mode . company-mode)
+  :init
+  (setq company-minimum-prefix-length 2
+        company-tooltip-limit 14
+        company-tooltip-align-annotations t
+        company-require-match 'never
+        company-global-modes
+        '(not erc-mode
+              message-mode
+              help-mode
+              gud-mode
+              vterm-mode)
+        company-frontends
+        '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+          company-echo-metadata-frontend)  ; show selected candidate docs in echo area
+
+        ;; Buffer-local backends will be computed when loading a major mode, so
+        ;; only specify a global default here.
+        company-backends '(company-capf)
+
+        ;; These auto-complete the current selection when
+        ;; `company-auto-commit-chars' is typed. This is too magical. We
+        ;; already have the much more explicit RET and TAB.
+        company-auto-commit nil
+
+        ;; Only search the current buffer for `company-dabbrev' (a backend that
+        ;; suggests text your open buffers). This prevents Company from causing
+        ;; lag once you have a lot of buffers open.
+        company-dabbrev-other-buffers nil
+        ;; Make `company-dabbrev' fully case-sensitive, to improve UX with
+        ;; domain-specific words with particular casing.
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil))
+
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "C-k") #'company-select-previous)
+  (define-key company-active-map (kbd "C-j") #'company-select-next))
+#+end_src
 ** Python
 #+begin_src emacs-lisp
 (use-package lsp-pyright
@@ -613,14 +726,8 @@ Not working quite as I would like it to.
                           (require 'lsp-pyright)
                           (lsp-deferred))))  ; or lsp-deferred
 #+end_src
-* Company
-#+begin_src emacs-lisp
-(add-hook 'after-init-hook 'global-company-mode)
-(with-eval-after-load 'company
-  (define-key company-active-map (kbd "C-k") #'company-select-previous)
-  (define-key company-active-map (kbd "C-j") #'company-select-next))
-#+end_src
 * Treemacs
+[[https://github.com/Alexander-Miller/treemacs][Treemacs]] opens a file tree.
 #+begin_src emacs-lisp
 (use-package treemacs
   :config
@@ -631,6 +738,12 @@ Not working quite as I would like it to.
   (general-evil-define-key 'normal treemacs-mode-map (kbd "q") 'treemacs-kill-buffer))
 #+end_src
 * Emacs Everywhere
+[[https://github.com/tecosaur/emacs-everywhere][Emacs Everywhere]]
 #+begin_src emacs-lisp
 (use-package emacs-everywhere)
+#+end_src
+* Password Store
+Interface with [[https://www.passwordstore.org/][Password Store]].
+#+begin_src emacs-lisp
+(use-package password-store)
 #+end_src
