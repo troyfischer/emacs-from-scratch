@@ -747,3 +747,23 @@ Interface with [[https://www.passwordstore.org/][Password Store]].
 #+begin_src emacs-lisp
 (use-package password-store)
 #+end_src
+* Yasnippets
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :hook (prog-mode . yas-minor-mode)
+  :config
+  (yas-reload-all))
+#+end_src
+* Smart Parens
+#+begin_src emacs-lisp
+(use-package smartparens
+  :hook (prog-mode . smartparens-mode))
+#+end_src
+* Origami
+Code folding: [[https://github.com/gregsexton/origami.el][Origami.el]] 
+#+begin_src emacs-lisp
+(use-package origami
+  :diminish t
+  :config
+  (origami-mode 1))
+#+end_src
