@@ -26,75 +26,7 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 (use-package straight
              :custom (straight-use-package-by-default t))
 #+end_src
-* Evil
-This has to be at the top of the config.
-Most important emacs package IMO, provides vim-like key bindings everywhere.
-
-Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil Help]]
-
-#+begin_src emacs-lisp
-;; Evil Mode
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  :config
-  (evil-mode 1)
-  (evil-set-initial-state 'dashboard-mode 'normal)
-
-  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
-  (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
-
-  ;; start all buffers in evil-normal-mode please
-  (setq evil-normal-state-modes
-      (append evil-emacs-state-modes
-              evil-insert-state-modes
-              evil-normal-state-modes
-              evil-motion-state-modes))
-
-  ;; unbind space, return, and tab in evil mode
-  (with-eval-after-load 'evil-maps
-    (define-key evil-motion-state-map (kbd "SPC") nil)
-    (define-key evil-motion-state-map (kbd "RET") nil)
-    (define-key evil-motion-state-map (kbd "TAB") nil))
-    
-  ;; Use evil in ibuffer
-  (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes)))
-
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
-;; Exit insert mode by pressing j and then k quickly
-(use-package key-chord
-  :config
-  (setq key-chord-two-keys-delay 0.5)
-  (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
-  (key-chord-mode 1))
-
-;; redo system
-(use-package undo-fu)
-(define-key evil-normal-state-map "u" 'undo-fu-only-undo)
-(define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo)
-#+end_src
-** Keybindings
-Package for binding keys when using evil.
-#+begin_src emacs-lisp
-;; keybindings using leader key
-(use-package general
-  :config 
-  (general-evil-setup t)
-  (general-evil-define-key 'normal 'global :prefix "SPC"))
-
-(general-create-definer my-leader-def :states '(normal visual) :keymaps 'override :prefix "SPC")
-
-(my-leader-def
-  ":" '(execute-extended-command :which-key "Command"))
-#+end_src
-* General
+* Base Config
 ** System Variables
 #+begin_src emacs-lisp
 (defconst IS-MAC     (eq system-type 'darwin))
@@ -233,6 +165,92 @@ Run ~fc-list~ to view available fonts.
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 #+end_src
+** Scrolling
+#+begin_src emacs-lisp
+(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
+(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+#+end_src
+** Hide Custom File
+#+begin_src emacs-lisp
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+#+end_src
+** Move to Trash
+Be careful-ish about deleting files.
+#+begin_src emacs-lisp
+(setq delete-by-moving-to-trash t)
+#+end_src
+* Evil
+This has to be at the top of the config.
+Most important emacs package IMO, provides vim-like key bindings everywhere.
+
+Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil Help]]
+
+#+begin_src emacs-lisp
+;; Evil Mode
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :config
+  (evil-mode 1)
+  (evil-set-initial-state 'dashboard-mode 'normal)
+
+  (define-key evil-normal-state-map (kbd "C-u") 'evil-scroll-up)
+  (define-key evil-visual-state-map (kbd "C-u") 'evil-scroll-up)
+
+  ;; start all buffers in evil-normal-mode please
+  (setq evil-normal-state-modes
+      (append evil-emacs-state-modes
+              evil-insert-state-modes
+              evil-normal-state-modes
+              evil-motion-state-modes))
+
+  ;; unbind space, return, and tab in evil mode
+  (with-eval-after-load 'evil-maps
+    (define-key evil-motion-state-map (kbd "SPC") nil)
+    (define-key evil-motion-state-map (kbd "RET") nil)
+    (define-key evil-motion-state-map (kbd "TAB") nil))
+    
+  ;; Use evil in ibuffer
+  (setq evil-emacs-state-modes (delq 'ibuffer-mode evil-emacs-state-modes)))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; Exit insert mode by pressing j and then k quickly
+(use-package key-chord
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
+  (key-chord-mode 1))
+
+;; redo system
+(use-package undo-fu)
+(define-key evil-normal-state-map "u" 'undo-fu-only-undo)
+(define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo)
+#+end_src
+** Keybindings
+Package for binding keys when using evil.
+#+begin_src emacs-lisp
+;; keybindings using leader key
+(use-package general
+  :config 
+  (general-evil-setup t)
+  (general-evil-define-key 'normal 'global :prefix "SPC"))
+
+(general-create-definer my-leader-def :states '(normal visual) :keymaps 'override :prefix "SPC")
+
+(my-leader-def
+  ":" '(execute-extended-command :which-key "Command"))
+#+end_src
 ** Window Movement
 #+begin_src emacs-lisp
 ;; switch between open frames
@@ -256,23 +274,6 @@ Run ~fc-list~ to view available fonts.
   "w <left>"  '(winner-undo :which-key "Winner undo")
   "w <right>" '(winner-redo :which-key "Winner redo"))
 #+end_src
-** Code Evaluation
-#+begin_src emacs-lisp
-(my-leader-def
-  "e" '(:ignore t :which-key "Evaluate")
-  "e b"   '(eval-buffer :which-key "Eval elisp in buffer")
-  "e d"   '(eval-defun :which-key "Eval defun")
-  "e e"   '(eval-expression :which-key "Eval elisp expression")
-  "e l"   '(eval-last-sexp :which-key "Eval last sexpression")
-  "e r"   '(eval-region :which-key "Eval region")) 
-#+end_src
-** Scrolling
-#+begin_src emacs-lisp
-(setq scroll-conservatively 101) ;; value greater than 100 gets rid of half page jumping
-(setq mouse-wheel-scroll-amount '(3 ((shift) . 3))) ;; how many lines at a time
-(setq mouse-wheel-progressive-speed t) ;; accelerate scrolling
-(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
-#+end_src
 ** Buffers
 #+begin_src emacs-lisp
 ;; buffers
@@ -287,23 +288,18 @@ Run ~fc-list~ to view available fonts.
   "b K"   '(kill-buffer :which-key "Kill buffer")
   "b r"   '(revert-buffer :which-key "Revert buffer"))
 #+end_src
-** Hide Custom File
+** Code Evaluation
 #+begin_src emacs-lisp
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
-#+end_src
-** Move to Trash
-Be careful-ish about deleting files.
-#+begin_src emacs-lisp
-(setq delete-by-moving-to-trash t)
+(my-leader-def
+  "e" '(:ignore t :which-key "Evaluate")
+  "e b"   '(eval-buffer :which-key "Eval elisp in buffer")
+  "e d"   '(eval-defun :which-key "Eval defun")
+  "e e"   '(eval-expression :which-key "Eval elisp expression")
+  "e l"   '(eval-last-sexp :which-key "Eval last sexpression")
+  "e r"   '(eval-region :which-key "Eval region")) 
 #+end_src
 * Dired
 #+begin_src emacs-lisp
-(use-package all-the-icons-dired)
-(use-package dired-open)
-(use-package peep-dired)
-
 (use-package dired
   :straight nil
   :config
@@ -337,6 +333,12 @@ Be careful-ish about deleting files.
                               ("mkv" . "mpv")
                               ("mp4" . "mpv")))
 
+#+end_src
+** Dired nice to have packages
+#+begin_src emacs-lisp
+(use-package all-the-icons-dired)
+(use-package dired-open)
+(use-package peep-dired)
 #+end_src
 * Which Key
 #+begin_src emacs-lisp
@@ -501,7 +503,7 @@ Be careful-ish about deleting files.
 #+begin_src emacs-lisp
 (use-package hydra)
 
-(defhydra hydra-text-scale (:timeout 4)
+(defhydra hydra-text-scale (:timeout 5)
   "scale text"
   ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
@@ -512,9 +514,7 @@ Be careful-ish about deleting files.
 (my-leader-def 
        "e h"   '(counsel-esh-history :which-key "Eshell history")
        "e s"   '(eshell :which-key "Eshell"))
-#+end_src
 
-#+begin_src emacs-lisp
 (use-package eshell-syntax-highlighting
   :after esh-mode
   :config
