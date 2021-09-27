@@ -765,5 +765,5 @@ Code folding: [[https://github.com/gregsexton/origami.el][Origami.el]]
 (use-package origami
   :diminish t
   :config
-  (origami-mode 1))
+  (global-origami-mode 1))
 #+end_src
