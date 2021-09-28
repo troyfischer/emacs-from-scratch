@@ -34,27 +34,6 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 #+end_src
 ** Performance Improvements
-*** Rendering/line scan
-#+begin_src emacs-lisp
-;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
-;; in non-focused windows.
-(setq-default cursor-in-non-selected-windows nil)
-(setq highlight-nonselected-windows nil)
-#+end_src
-*** Message Noise
-#+begin_src emacs-lisp
-;; Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
-;; is more than enough.
-(setq inhibit-startup-message t
-      inhibit-startup-echo-area-message user-login-name
-      inhibit-default-init t
-      ;; Shave seconds off startup time by starting the scratch buffer in
-      ;; `fundamental-mode', rather than, say, `org-mode' or `text-mode', which
-      ;; pull in a ton of packages. `doom/open-scratch-buffer' provides a better
-      ;; scratch buffer anyway.
-      initial-major-mode 'fundamental-mode
-      initial-scratch-message nil)
-#+end_src
 *** Garbage Collection
 #+begin_src emacs-lisp
 ;; Using garbage magic hack.
@@ -77,11 +56,6 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 					gcs-done)))
 
 ;; Silence compiler warnings as they can be pretty disruptive (setq comp-async-report-warnings-errors nil)
-#+end_src
-*** UI updates
-#+begin_src emacs-lisp
-;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
-(setq idle-update-delay 1.0)  ; default is 0.5
 #+end_src
 *** Doom Recommendations
 #+begin_src emacs-lisp
@@ -111,7 +85,33 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 ;; slightly less to process at startup.
 (unless IS-MAC   (setq command-line-ns-option-alist nil))
 (unless IS-LINUX (setq command-line-x-option-alist nil))
-
+#+end_src
+**** Security
+#+begin_src emacs-lisp
+;; Emacs is essentially one huge security vulnerability, what with all the
+;; dependencies it pulls in from all corners of the globe. Let's try to be at
+;; least a little more discerning.
+(setq gnutls-verify-error (not (getenv-internal "INSECURE"))
+      gnutls-algorithm-priority
+      (when (boundp 'libgnutls-version)
+        (concat "SECURE128:+SECURE192:-VERS-ALL"
+                (if (and (not IS-WINDOWS)
+                         (>= libgnutls-version 30605))
+                    ":+VERS-TLS1.3")
+                ":+VERS-TLS1.2"))
+      ;; `gnutls-min-prime-bits' is set based on recommendations from
+      ;; https://www.keylength.com/en/4/
+      gnutls-min-prime-bits 3072
+      tls-checktrust gnutls-verify-error
+      ;; Emacs is built with `gnutls' by default, so `tls-program' would not be
+      ;; used in that case. Otherwise, people have reasons to not go with
+      ;; `gnutls', we use `openssl' instead. For more details, see
+      ;; https://redd.it/8sykl1
+      tls-program '("openssl s_client -connect %h:%p -CAfile %t -nbio -no_ssl3 -no_tls1 -no_tls1_1 -ign_eof"
+                    "gnutls-cli -p %p --dh-bits=3072 --ocsp --x509cafile=%t \
+--strict-tofu --priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3' %h"
+                    ;; compatibility fallbacks
+                    "gnutls-cli -p %p %h"))
 
 ;; Emacs stores `authinfo' in $HOME and in plain-text. Let's not do that, mkay?
 ;; This file stores usernames, passwords, and other such treasures for the
@@ -120,6 +120,32 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
                          "~/.authinfo.gpg"))
 #+end_src
 
+**** Message Noise
+#+begin_src emacs-lisp
+;; Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
+;; is more than enough.
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name
+      inhibit-default-init t
+      ;; Shave seconds off startup time by starting the scratch buffer in
+      ;; `fundamental-mode', rather than, say, `org-mode' or `text-mode', which
+      ;; pull in a ton of packages. `doom/open-scratch-buffer' provides a better
+      ;; scratch buffer anyway.
+      initial-major-mode 'fundamental-mode
+      initial-scratch-message nil)
+#+end_src
+**** Rendering/line scan
+#+begin_src emacs-lisp
+;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+;; in non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+#+end_src
+**** UI updates
+#+begin_src emacs-lisp
+;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
+(setq idle-update-delay 1.0)  ; default is 0.5
+#+end_src
 ** Themes
 #+begin_src emacs-lisp
 ;; Doom themes
@@ -276,20 +302,6 @@ Package for binding keys when using evil.
   ;; winner mode
   "w <left>"  '(winner-undo :which-key "Winner undo")
   "w <right>" '(winner-redo :which-key "Winner redo"))
-#+end_src
-** Buffers
-#+begin_src emacs-lisp
-;; buffers
-(my-leader-def
-  "b"     '(:ignore t :which-key "Buffer")
-  "b b"   '(ibuffer :which-key "Ibuffer")
-  "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
-  "b k"   '(kill-current-buffer :which-key "Kill current buffer")
-  "b n"   '(next-buffer :which-key "Next buffer")
-  "b p"   '(previous-buffer :which-key "Previous buffer")
-  "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
-  "b K"   '(kill-buffer :which-key "Kill buffer")
-  "b r"   '(revert-buffer :which-key "Revert buffer"))
 #+end_src
 ** Code Evaluation
 #+begin_src emacs-lisp
@@ -588,7 +600,7 @@ Package for binding keys when using evil.
 
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ;; emacs client should always open dashboard
 #+end_src
-* Projectile 
+* Projectile
 #+begin_src emacs-lisp
 (use-package projectile
   :config
@@ -597,6 +609,7 @@ Package for binding keys when using evil.
     "p f" '(projectile-find-file :which-key "Find file")
     "p p" '(projectile-switch-project :which-key "Switch projects")
     "p g" '(projectile-grep :which-key "Grep"))
+  (setq projectile-switch-project-action #'projectile-dired)
   (setq projectile-completion-system 'ivy))
 #+end_src
 * Language Support
@@ -769,4 +782,52 @@ Code folding: [[https://github.com/gregsexton/origami.el][Origami.el]]
   :diminish t
   :config
   (global-origami-mode 1))
+#+end_src
+* Perspective
+Buffer management: [[https://github.com/nex3/perspective-el][Perspective]] 
+#+begin_src emacs-lisp
+(use-package perspective
+  :config
+  (my-leader-def
+    "b"     '(:ignore t :which-key "Buffer")
+    "b b"   '(persp-ivy-switch-buffer :which-key "Switch buffer")
+    "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
+    "b i"   '(ibuffer :which-key "ibuffer")
+    "b k"   '(kill-current-buffer :which-key "Kill current buffer")
+    "b n"   '(next-buffer :which-key "Next buffer")
+    "b p"   '(previous-buffer :which-key "Previous buffer")
+    "b B"   '(ibuffer-list-buffers :which-key "Ibuffer list buffers")
+    "b K"   '(kill-buffer :which-key "Kill buffer")
+    "b r"   '(revert-buffer :which-key "Revert buffer"))
+  (persp-mode))
+#+end_src
+
+TODO: try to get actual workspaces working
+#+begin_src emacs-lisp
+;; (use-package persp-mode
+;;   :config
+;;   (persp-mode)
+;;   (persp-add-new "main")
+;;   (my-leader-def
+;;     "<tab>"     '(:ignore t :which-key "Workspace")
+;;     "<tab> s"     '(persp-switch :which-key "Switch")))
+
+;; (with-eval-after-load "persp-mode"
+;;   (with-eval-after-load "ivy"
+;;     (add-hook 'ivy-ignore-buffers
+;;               #'(lambda (b)
+;;                   (when persp-mode
+;;                     (let ((persp (get-current-persp)))
+;;                       (if persp
+;;                           (not (persp-contain-buffer-p b persp))
+;;                         nil)))))
+
+;;     (setq ivy-sort-functions-alist
+;;           (append ivy-sort-functions-alist
+;;                   '((persp-kill-buffer   . nil)
+;;                     (persp-remove-buffer . nil)
+;;                     (persp-add-buffer    . nil)
+;;                     (persp-switch        . nil)
+;;                     (persp-window-switch . nil)
+;;                     (persp-frame-switch  . nil))))))
 #+end_src
