@@ -281,7 +281,7 @@ Package for binding keys when using evil.
   ":" '(execute-extended-command :which-key "Command")
   "m" '(:ignore t :which-key "local-leader"))
 
-(general-create-definer my-local-leader :state '(normal visual) :keymaps 'override :prefix my-local-leader)
+(general-create-definer my-local-leader-def :state '(normal visual) :keymaps 'override :prefix my-local-leader)
 
 (define-key minibuffer-local-map (kbd "C-p") 'clipboard-yank)
 #+end_src
@@ -399,16 +399,218 @@ Package for binding keys when using evil.
     "f U"   '(sudo-edit :which-key "Sudo edit file")))
 #+end_src
 * Org
+** Keybinding hook
+#+begin_src emacs-lisp 
+  (defun org-load-hook ()
+    (general-nmap 
+      :prefix 'my-local-leader
+      :keymaps 'org-mode-map
+          "#" 'org-update-statistics-cookies
+          "'" 'org-edit-special
+          "*" 'org-ctrl-c-star
+          "+" 'org-ctrl-c-minus
+          "," 'org-switchb
+          "." 'org-goto
+          "." 'counsel-org-goto
+          "/" 'counsel-org-goto-all
+          "A" 'org-archive-subtree
+          "e" 'org-export-dispatch
+          "f" 'org-footnote-action
+          "h" 'org-toggle-heading
+          "i" 'org-toggle-item
+          "I" 'org-id-get-create
+          "n" 'org-store-link
+          "o" 'org-set-property
+          "q" 'org-set-tags-command
+          "t" 'org-todo
+          "T" 'org-todo-list
+          "x" 'org-toggle-checkbox)
+    (my-local-leader-def
+      "a" '(:ignore t :which-key "attachments+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " a")
+      :keymaps 'org-mode-map
+	   "a" 'org-attach
+	   "d" 'org-attach-delete-one
+	   "D" 'org-attach-delete-all
+	   "f" '+org/find-file-in-attachments
+	   "l" '+org/attach-file-and-insert-link
+	   "n" 'org-attach-new
+	   "o" 'org-attach-open
+	   "O" 'org-attach-open-in-emacs
+	   "r" 'org-attach-reveal
+	   "R" 'org-attach-reveal-in-emacs
+	   "u" 'org-attach-url
+	   "s" 'org-attach-set-directory
+	   "S" 'org-attach-sync)
+
+    (my-local-leader-def
+      "b" '(:ignore t :which-key "tables+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " b")
+      :keymaps 'org-mode-map
+	   "-" 'org-table-insert-hline
+	   "a" 'org-table-align
+	   "b" 'org-table-blank-field
+	   "c" 'org-table-create-or-convert-from-region
+	   "e" 'org-table-edit-field
+	   "f" 'org-table-edit-formulas
+	   "h" 'org-table-field-info
+	   "s" 'org-table-sort-lines
+	   "r" 'org-table-recalculate
+	   "R" 'org-table-recalculate-buffer-tables)
+
+    ;; (my-local-leader-def
+    ;;   "d" '(:ignore t :which-key "delete+"))
+    ;; (general-nmap 
+    ;;   :prefix (concat my-local-leader " d")
+    ;;   :keymaps 'org-mode-map
+    ;;         "c" 'org-table-delete-column
+    ;;         "r" 'org-table-kill-row)
+
+    (my-local-leader-def
+      "i" '(:ignore t :which-key "insert+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " i")
+      :keymaps 'org-mode-map
+	    "c" 'org-table-insert-column
+	    "h" 'org-table-insert-hline
+	    "r" 'org-table-insert-row
+	    "H" 'org-table-hline-and-move)
+
+    (my-local-leader-def
+      "t" '(:ignore t :which-key "toggle+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " t")
+      :keymaps 'org-mode-map
+	    "f" 'org-table-toggle-formula-debugger
+	    "o" 'org-table-toggle-coordinate-overlays)
+
+    (my-local-leader-def
+      "c" '(:ignore t :which-key "clock+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " c")
+      :keymaps 'org-mode-map
+	   "c" 'org-clock-cancel
+	   "d" 'org-clock-mark-default-task
+	   "e" 'org-clock-modify-effort-estimate
+	   "E" 'org-set-effort
+	   "g" 'org-clock-goto
+	   "l" '+org/toggle-last-clock
+	   "i" 'org-clock-in
+	   "I" 'org-clock-in-last
+	   "o" 'org-clock-out
+	   "r" 'org-resolve-clocks
+	   "R" 'org-clock-report
+	   "t" 'org-evaluate-time-range
+	   "=" 'org-clock-timestamps-up
+	   "-" 'org-clock-timestamps-down)
+
+    (my-local-leader-def
+      "d" '(:ignore t :which-key "date/deadline+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " d")
+      :keymaps 'org-mode-map
+	   "d" 'org-deadline
+	   "s" 'org-schedule
+	   "t" 'org-time-stamp
+	   "T" 'org-time-stamp-inactive)
+
+    (my-local-leader-def
+      "g" '(:ignore t :which-key "goto+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " g")
+      :keymaps 'org-mode-map
+	  "g" 'counsel-org-goto
+	  "G" 'counsel-org-goto-all
+	  "c" 'org-clock-goto
+	  "i" 'org-id-goto
+	  "r" 'org-refile-goto-last-stored
+	  "v" '+org/goto-visible
+	  "x" 'org-capture-goto-last-stored)
+
+    (my-local-leader-def
+      "l" '(:ignore t :which-key "links+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " l")
+      :keymaps 'org-mode-map
+	   "c" 'org-cliplink
+	   "d" '+org/remove-link
+	   "i" 'org-id-store-link
+	   "l" 'org-insert-link
+	   "L" 'org-insert-all-links
+	   "s" 'org-store-link
+	   "S" 'org-insert-last-stored-link
+	   "t" 'org-toggle-link-display)
+
+    (my-local-leader-def
+      "P" '(:ignore t :which-key "publish+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " P")
+      :keymaps 'org-mode-map
+	   "a" 'org-publish-all
+	   "f" 'org-publish-current-file
+	   "p" 'org-publish
+	   "P" 'org-publish-current-project
+	   "s" 'org-publish-sitemap)
+
+    (my-local-leader-def
+      "r" '(:ignore t :which-key "refile+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " r")
+      :keymaps 'org-mode-map
+	   "." '+org/refile-to-current-file
+	   "c" '+org/refile-to-running-clock
+	   "l" '+org/refile-to-last-location
+	   "f" '+org/refile-to-file
+	   "o" '+org/refile-to-other-window
+	   "O" '+org/refile-to-other-buffer
+	   "v" '+org/refile-to-visible
+	   "r" 'org-refile) ; to all `org-refile-targets'
+
+    (my-local-leader-def
+      "s" '(:ignore t :which-key "tree/subtree+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " s")
+      :keymaps 'org-mode-map
+	   "a" 'org-toggle-archive-tag
+	   "b" 'org-tree-to-indirect-buffer
+	   "c" 'org-clone-subtree-with-time-shift
+	   "d" 'org-cut-subtree
+	   "h" 'org-promote-subtree
+	   "j" 'org-move-subtree-down
+	   "k" 'org-move-subtree-up
+	   "l" 'org-demote-subtree
+	   "n" 'org-narrow-to-subtree
+	   "r" 'org-refile
+	   "s" 'org-sparse-tree
+	   "A" 'org-archive-subtree
+	   "N" 'widen
+	   "S" 'org-sort)
+
+    (my-local-leader-def
+      "p" '(:ignore t :which-key "priority+"))
+    (general-nmap 
+      :prefix (concat my-local-leader " p")
+      :keymaps 'org-mode-map
+	   "d" 'org-priority-down
+	   "p" 'org-priority
+	   "u" 'org-priority-up))
+#+end_src
+
+** Config
 #+begin_src emacs-lisp
 (use-package org
   :straight nil
-  :hook (org-mode . org-indent-mode)
+  :hook ((org-mode . org-indent-mode)
+         (org-mode . org-load-hook))
   :bind (("M-k" . org-move-subtree-up)
          ("M-j" . org-move-subtree-down)
          ("M-h" . org-promote-subtree)
          ("M-l" . org-demote-subtree))
   :config
   (define-key org-mode-map (kbd "M-h") #'org-promote-subtree) ;; have to override this in the major mode map
+  (setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
   (setq org-ellipsis "…"
 	org-hide-emphasis-markers t
 	org-journal-date-format "%B %d, %Y (%A) "
@@ -417,21 +619,11 @@ Package for binding keys when using evil.
 	org-src-tab-acts-natively t
 	org-edit-src-content-indentation 0
 	org-directory "~/org/"
-	org-agenda-files (expand-file-name "agenda.org" org-directory)
+	org-agenda-files '("~/org/agenda.org")
 	org-default-notes-file (expand-file-name "notes.org" org-directory)))
 
-;; (use-package org-bullets
-;;   :hook (org-mode . (lambda () (org-bullets-mode 1))))
-
 (require 'org-tempo nil t)
-#+end_src
 
-#+begin_src emacs-lisp
-(setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
-
-(my-leader-def
-  "o"   '(:ignore t :which-key "Org")
-  "o l" '(org-insert-link :which-key "Insert Link"))
 #+end_src
 
 *** Source Blocks
