@@ -267,16 +267,21 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
 ** Keybindings
 Package for binding keys when using evil.
 #+begin_src emacs-lisp
+(defconst my-leader "SPC")
+(defconst my-local-leader "SPC m")
 ;; keybindings using leader key
 (use-package general
   :config 
   (general-evil-setup t)
-  (general-evil-define-key 'normal 'global :prefix "SPC"))
+  (general-evil-define-key 'normal 'global :prefix my-leader))
 
-(general-create-definer my-leader-def :states '(normal visual) :keymaps 'override :prefix "SPC")
+(general-create-definer my-leader-def :states '(normal visual) :keymaps 'override :prefix my-leader)
 
 (my-leader-def
-  ":" '(execute-extended-command :which-key "Command"))
+  ":" '(execute-extended-command :which-key "Command")
+  "m" '(:ignore t :which-key "local-leader"))
+
+(general-create-definer my-local-leader :state '(normal visual) :keymaps 'override :prefix my-local-leader)
 
 (define-key minibuffer-local-map (kbd "C-p") 'clipboard-yank)
 #+end_src
