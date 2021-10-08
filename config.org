@@ -658,7 +658,6 @@ Package for binding keys when using evil.
   :straight nil
   :hook ((org-agenda-mode . org-agenda-load-hook)))
 #+end_src
-
 * Ivy (Counsel/Swiper)
 #+begin_src emacs-lisp
 (use-package counsel
@@ -973,6 +972,7 @@ I always work from python virtual environments.
 Interface with [[https://www.passwordstore.org/][Password Store]].
 #+begin_src emacs-lisp
 (use-package password-store)
+(use-package password-store-otp)
 #+end_src
 * Yasnippets
 #+begin_src emacs-lisp
@@ -1041,4 +1041,17 @@ TODO: try to get actual workspaces working
 ;;                     (persp-switch        . nil)
 ;;                     (persp-window-switch . nil)
 ;;                     (persp-frame-switch  . nil))))))
+#+end_src
+* Highlight TODO
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :hook (prog-mode . hl-todo-mode)
+  :hook (org-mode . hl-todo-mode)
+  :hook (yaml-mode . hl-todo-mode))
+#+end_src
+* Git Gutter
+#+begin_src emacs-lisp
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode +1))
 #+end_src
