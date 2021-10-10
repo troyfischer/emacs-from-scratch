@@ -732,7 +732,7 @@ Package for binding keys when using evil.
   "scale text"
   ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
+  ("q" nil "cancel" :exit t :color blue))
 #+end_src
 * Eshell
 #+begin_src emacs-lisp
@@ -1043,15 +1043,44 @@ TODO: try to get actual workspaces working
 ;;                     (persp-frame-switch  . nil))))))
 #+end_src
 * Highlight TODO
+[[https://github.com/tarsius/hl-todo][hl-todo]] for highlighting keywords.
 #+begin_src emacs-lisp
 (use-package hl-todo
-  :hook (prog-mode . hl-todo-mode)
-  :hook (org-mode . hl-todo-mode)
-  :hook (yaml-mode . hl-todo-mode))
+  :hook ((prog-mode . hl-todo-mode)
+         (org-mode . hl-todo-mode)
+	   (yaml-mode . hl-todo-mode))
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("BUG"        error bold)
+          ("DEPRECATED" font-lock-doc-face bold))))
 #+end_src
 * Git Gutter
 #+begin_src emacs-lisp
 (use-package git-gutter
   :config
   (global-git-gutter-mode +1))
+#+end_src
+* RGB
+[[https://github.com/emacsmirror/rainbow-mode][rainbow-mode]]
+[[https://github.com/emacsfodder/kurecolor][kurecolor]]
+#+begin_src emacs-lisp
+(use-package rainbow-mode)
+(use-package kurecolor)
+
+(defhydra +rgb/kurecolor-hydra (:color pink :hint nil)
+  "
+Inc/Dec      _w_/_W_ brightness      _d_/_D_ saturation      _e_/_E_ hue    "
+  ("w" kurecolor-decrease-brightness-by-step)
+  ("W" kurecolor-increase-brightness-by-step)
+  ("d" kurecolor-decrease-saturation-by-step)
+  ("D" kurecolor-increase-saturation-by-step)
+  ("e" kurecolor-decrease-hue-by-step)
+  ("E" kurecolor-increase-hue-by-step)
+  ("q" nil "cancel" :color blue))
 #+end_src
