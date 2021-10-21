@@ -307,6 +307,8 @@ Package for binding keys when using evil.
 (winner-mode 1)
 (my-leader-def
   "w" '(:ignore t :which-key "Window")
+  ;; Delete all windows
+  "w D"   '(delete-other-windows :which-key "Focus current window")
   ;; Window splits
   "w d"   '(evil-window-delete :which-key "Close window")
   "w n"   '(evil-window-new :which-key "New window")
