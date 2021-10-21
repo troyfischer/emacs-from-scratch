@@ -1105,3 +1105,30 @@ Inc/Dec      _w_/_W_ brightness      _d_/_D_ saturation      _e_/_E_ hue    "
   ("E" kurecolor-increase-hue-by-step)
   ("q" nil "cancel" :color blue))
 #+end_src
+* Latex
+#+begin_src emacs-lisp
+(use-package adaptive-wrap)
+(use-package latex-preview-pane)
+(use-package evil-tex)
+(use-package auctex-latexmk)
+(use-package cdlatex)
+(use-package company-auctex)
+(use-package company-reftex)
+(use-package company-math)
+(use-package tex
+  :straight auctex)
+#+end_src
+* Vterm
+#+begin_src emacs-lisp
+(use-package vterm
+  :config
+  (my-leader-def
+    "o v" '(vterm-other-window :which-key "vterm")))
+#+end_src
+* Bookmarks
+#+begin_src emacs-lisp
+(my-leader-def
+  "o b" '(:ignore t :which-key "Bookmarks")
+  "o b l" '(list-bookmarks :which-key "List")
+  "o b s" '(bookmark-set :which-key "Set"))
+#+end_src
