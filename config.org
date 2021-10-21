@@ -116,7 +116,7 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 ;; Emacs stores `authinfo' in $HOME and in plain-text. Let's not do that, mkay?
 ;; This file stores usernames, passwords, and other such treasures for the
 ;; aspiring malicious third party.
-(setq auth-sources (list (concat "~/.emacs.d" "authinfo.gpg")
+(setq auth-sources (list (concat user-emacs-directory "authinfo.gpg")
                          "~/.authinfo.gpg"))
 #+end_src
 
