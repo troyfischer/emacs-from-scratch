@@ -204,6 +204,20 @@ Run ~fc-list~ to view available fonts.
 (when (file-exists-p custom-file)
   (load custom-file))
 #+end_src
+** Hide backup/autosave files
+#+begin_src emacs-lisp
+(defvar backup-dir (expand-file-name "backup/" user-emacs-directory))
+(defvar autosave-dir (expand-file-name "autosave/" user-emacs-directory))
+
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+      backup-by-copying t
+      version-control t
+      delete-old-versions t
+      kept-new-versions 20
+      kept-old-versions 5)
+(setq auto-save-list-file-prefix autosave-dir)
+;;(setq auto-save-file-name-transforms `((".*" ,autosave-dir t)))
+#+end_src
 ** Move to Trash
 Be careful-ish about deleting files.
 #+begin_src emacs-lisp
