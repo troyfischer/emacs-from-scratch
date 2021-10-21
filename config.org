@@ -884,11 +884,12 @@ Package for binding keys when using evil.
     "p g" '(projectile-grep :which-key "Grep"))
   (setq projectile-switch-project-action #'projectile-dired)
   (setq projectile-completion-system 'ivy))
+
+;; projectile makes TRAMP slow...
+(defadvice projectile-project-root (around ignore-remote first activate)
+  (unless (file-remote-p default-directory 'no-identification) ad-do-it))
 #+end_src
 * Language Support
-#+begin_src emacs-lisp
-(use-package groovy-mode)
-#+end_src
 ** Python
 I always work from python virtual environments.
 #+begin_src emacs-lisp
