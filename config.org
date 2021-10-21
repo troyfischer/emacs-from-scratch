@@ -592,12 +592,11 @@ Package for binding keys when using evil.
   :straight nil
   :hook ((org-mode . org-indent-mode)
          (org-mode . org-load-hook))
-  :bind (("M-k" . org-metaup)
-         ("M-j" . org-metadown)
-         ("M-h" . org-metaleft)
-         ("M-l" . org-metaright))
   :config
-  (define-key org-mode-map (kbd "M-h") #'org-promote-subtree) ;; have to override this in the major mode map
+  (general-def org-mode-map "M-h" 'org-promote-subtree)
+  (general-def org-mode-map "C-<return>" 'org-insert-heading-respect-content-and-insert)
+  (general-def org-mode-map "C-S-j" 'org-shiftup)
+  (general-def org-mode-map "C-S-k" 'org-shiftdown)
   (setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
   ;; Source blocks
   (setq org-src-fontify-natively t
