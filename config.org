@@ -653,16 +653,22 @@ Package for binding keys when using evil.
 
 (require 'org-tempo nil t)
 
+(defun org-insert-heading-respect-content-and-insert ()
+  (interactive)
+  (org-insert-heading-respect-content)
+  (when (or (eq evil-state 'normal) (eq evil-state 'visual))
+    (evil-append nil)))
+
 ;; auto indent
 (defun indent-org-block-automatically ()
-  (interactive 
-   (when (org-in-src-block-p)
-     (org-edit-special)
-     (indent-region (point-min) (point-max))
-     (org-edit-src-exit))))
+  (interactive)
+  (when (org-in-src-block-p)
+    (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)))
 #+end_src
-** Agenda
-*** Config
+*** Agenda
+**** Config
 #+begin_src emacs-lisp
 (defun org-agenda-load-hook ()
   (general-nmap
