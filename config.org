@@ -897,14 +897,19 @@ I always work from python virtual environments.
   :ensure t
   :config
   (pyvenv-mode t)
-
+  ;; should help with slow output when printing to inferior python process
+  (setq python-shell-enable-font-lock nil)
   ;; Set correct Python interpreter
   (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+	(list (lambda ()
+		(setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
   (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
+	(list (lambda ()
+		(setq python-shell-interpreter "python3")))))
+#+end_src
+** Groovy
+#+begin_src emacs-lisp
+(use-package groovy-mode)
 #+end_src
 * Lsp
 #+begin_src emacs-lisp
