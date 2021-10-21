@@ -830,7 +830,8 @@ Package for binding keys when using evil.
   (general-evil-define-key 'normal magit-mode-map (kbd "p") 'magit-push)
   (general-evil-define-key 'normal magit-mode-map (kbd "P") 'magit-pull)
   (general-evil-define-key 'normal magit-mode-map (kbd "f") 'magit-fetch)
-  ;;(general-evil-define-key 'normal text-mode-map (kbd "zz") 'with-editor-finish)
+  ;; display as focused window on git status
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1) 
   (my-leader-def 
     "g" '(:ignore t :which-key "Magit")
     "g s" '(magit-status :which-key "status")
