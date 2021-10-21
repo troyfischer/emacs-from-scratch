@@ -293,7 +293,8 @@ Package for binding keys when using evil.
 
 (my-leader-def
   ":" '(execute-extended-command :which-key "Command")
-  "m" '(:ignore t :which-key "local-leader"))
+  "m" '(:ignore t :which-key "local-leader")
+  "o" '(:ignore t :which-key "open"))
 
 (general-create-definer my-local-leader-def :state '(normal visual) :keymaps 'override :prefix my-local-leader)
 
