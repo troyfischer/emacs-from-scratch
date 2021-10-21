@@ -656,7 +656,16 @@ Package for binding keys when using evil.
 
 (use-package org-agenda 
   :straight nil
-  :hook ((org-agenda-mode . org-agenda-load-hook)))
+  :hook ((org-agenda-mode . org-agenda-load-hook))
+  :config
+  (my-leader-def
+    "o A" '(org-agenda :which-key "Agenda")))
+
+;; move through calendar when scheduling in org
+(define-key org-read-date-minibuffer-local-map (kbd "C-j") (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-week 1))))
+(define-key org-read-date-minibuffer-local-map (kbd "C-k") (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-week 1))))
+(define-key org-read-date-minibuffer-local-map (kbd "C-h") (lambda () (interactive) (org-eval-in-calendar '(calendar-backward-day 1))))
+(define-key org-read-date-minibuffer-local-map (kbd "C-l") (lambda () (interactive) (org-eval-in-calendar '(calendar-forward-day 1))))
 #+end_src
 * Ivy (Counsel/Swiper)
 #+begin_src emacs-lisp
