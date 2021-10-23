@@ -150,7 +150,7 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 #+begin_src emacs-lisp
 ;; Doom themes
 (use-package doom-themes)
-(load-theme 'doom-Iosvkem t)
+(load-theme 'doom-xcode t)
 
 ;; Doom modeline
 (use-package doom-modeline)
@@ -437,7 +437,7 @@ Package for binding keys when using evil.
         "o" 'org-set-property
         "q" 'org-set-tags-command
         "t" 'org-todo
-        "T" 'org-todo-list
+        ;; "T" 'org-todo-list using this for timer function now
         "x" 'org-toggle-checkbox)
 
   (my-local-leader-def
@@ -474,6 +474,23 @@ Package for binding keys when using evil.
 	 "s" 'org-table-sort-lines
 	 "r" 'org-table-recalculate
 	 "R" 'org-table-recalculate-buffer-tables)
+
+  (defun start-pomodoro-session ()
+    (interactive)
+    (org-timer-set-timer 25))
+  (defun start-pomodoro-break ()
+    (interactive)
+    (org-timer-set-timer 5))
+  (my-local-leader-def
+    "T" '(:ignore t :which-key "Timer"))
+  (general-nmap
+    :prefix (concat my-local-leader " T")
+    :keymaps 'org-mode-map
+	 "s" 'org-timer-set-timer
+	 "S" 'org-timer-stop
+	 "t" 'org-timer-pause-or-continue
+	 "p" 'start-pomodoro-session
+	 "b" 'start-pomodoro-break)
 
   (my-local-leader-def
     "c" '(:ignore t :which-key "clock"))
@@ -594,9 +611,14 @@ Package for binding keys when using evil.
          (org-mode . org-load-hook))
   :config
   (general-def org-mode-map "M-h" 'org-promote-subtree)
+  (general-def org-mode-map "M-l" 'org-demote-subtree)
   (general-def org-mode-map "C-<return>" 'org-insert-heading-respect-content-and-insert)
+  (evil-define-key 'normal org-mode-map (kbd "M-<return>") 'org-meta-return-and-insert)
+  (evil-define-key 'normal org-mode-map (kbd "M-S-<return>") 'org-insert-todo-heading-and-insert)
   (general-def org-mode-map "C-S-j" 'org-shiftup)
   (general-def org-mode-map "C-S-k" 'org-shiftdown)
+  ;; org clock sound
+  (setq org-clock-sound (expand-file-name "ding.wav" user-emacs-directory))
   (setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
   ;; Source blocks
   (setq org-src-fontify-natively t
@@ -656,7 +678,17 @@ Package for binding keys when using evil.
 (defun org-insert-heading-respect-content-and-insert ()
   (interactive)
   (org-insert-heading-respect-content)
-  (when (or (eq evil-state 'normal) (eq evil-state 'visual))
+  (when (or (eq evil-state 'normal))
+    (evil-append nil)))
+(defun org-meta-return-and-insert ()
+  (interactive)
+  (org-meta-return)
+  (when (or (eq evil-state 'normal))
+    (evil-append nil)))
+(defun org-insert-todo-heading-and-insert ()
+  (interactive)
+  (org-insert-todo-heading nil)
+  (when (or (eq evil-state 'normal))
     (evil-append nil)))
 
 ;; auto indent
