@@ -155,6 +155,10 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 ;; Doom modeline
 (use-package doom-modeline)
 (doom-modeline-mode 1)
+
+;; set transparency
+(set-frame-parameter (selected-frame) 'alpha '(85 85))
+(add-to-list 'default-frame-alist '(alpha 85 85))
 #+end_src
 *** Font
 Run ~fc-list~ to view available fonts.
