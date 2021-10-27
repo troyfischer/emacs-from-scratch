@@ -1164,3 +1164,8 @@ Inc/Dec      _w_/_W_ brightness      _d_/_D_ saturation      _e_/_E_ hue    "
   "o b l" '(list-bookmarks :which-key "List")
   "o b s" '(bookmark-set :which-key "Set"))
 #+end_src
+* Anki
+#+begin_src emacs-lisp
+(use-package anki-connect)
+(use-package anki-editor)
+#+end_src
