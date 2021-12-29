@@ -481,10 +481,10 @@ Package for binding keys when using evil.
 
   (defun start-pomodoro-session ()
     (interactive)
-    (org-timer-set-timer 25))
+    (org-timer-set-timer 30))
   (defun start-pomodoro-break ()
     (interactive)
-    (org-timer-set-timer 5))
+    (org-timer-set-timer 6))
   (my-local-leader-def
     "T" '(:ignore t :which-key "Timer"))
   (general-nmap
@@ -614,13 +614,11 @@ Package for binding keys when using evil.
   :hook ((org-mode . org-indent-mode)
          (org-mode . org-load-hook))
   :config
-  (general-def org-mode-map "M-h" 'org-promote-subtree)
-  (general-def org-mode-map "M-l" 'org-demote-subtree)
   (general-def org-mode-map "C-<return>" 'org-insert-heading-respect-content-and-insert)
   (evil-define-key 'normal org-mode-map (kbd "M-<return>") 'org-meta-return-and-insert)
   (evil-define-key 'normal org-mode-map (kbd "M-S-<return>") 'org-insert-todo-heading-and-insert)
-  (general-def org-mode-map "C-S-j" 'org-shiftup)
-  (general-def org-mode-map "C-S-k" 'org-shiftdown)
+  (general-def org-mode-map "C-S-k" 'org-shiftup)
+  (general-def org-mode-map "C-S-j" 'org-shiftdown)
   ;; org clock sound
   (setq org-clock-sound (expand-file-name "ding.wav" user-emacs-directory))
   (setq org-return-follows-link t) ;; RETURN will follow links in org-mode files
@@ -629,9 +627,10 @@ Package for binding keys when using evil.
 	org-src-tab-acts-natively t
 	org-confirm-babel-evaluate nil
 	org-edit-src-content-indentation 0)
-  (setq org-babel-load-languages '((emacs-lisp . t)
+  (org-babel-do-load-languages 'org-babel-load-languages '((emacs-lisp . t)
                                    (python . t)
                                    (groovy . t)))
+  (setq org-babel-python-command "python3")
   ;; doom todo keywords
   (setq org-todo-keywords
         '((sequence
@@ -674,7 +673,7 @@ Package for binding keys when using evil.
 	org-src-tab-acts-natively t
 	org-edit-src-content-indentation 0
 	org-directory "~/org/"
-	org-agenda-files '("~/org/agenda.org")
+	org-agenda-files '("~/org/agenda/agenda.org")
 	org-default-notes-file (expand-file-name "notes.org" org-directory)))
 
 (require 'org-tempo nil t)
@@ -890,7 +889,7 @@ Package for binding keys when using evil.
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs saves lives.")
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner "~/.emacs.d/emacs-e.svg")  ;; use custom image as banner
+  (setq dashboard-startup-banner (expand-file-name "emacs-e.svg" user-emacs-directory))  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
