@@ -890,6 +890,8 @@ Package for binding keys when using evil.
       (t . 10)))
   :config
   (ivy-posframe-mode 1)) ; 1 enables posframe-mode, 0 disables it.
+
+(use-package ivy-hydra)
   
 (use-package smex
  :config
