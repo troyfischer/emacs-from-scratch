@@ -341,12 +341,17 @@ Github readme for all things evil: [[https://github.com/noctuid/evil-guide][Evil
   :config
   (evil-collection-init))
 
-;; Exit insert mode by pressing j and then k quickly
-(use-package key-chord
-  :config
-  (setq key-chord-two-keys-delay 0.5)
-  (key-chord-define evil-insert-state-map "kj" 'evil-normal-state)
-  (key-chord-mode 1))
+(defun evil-keyboard-quit ()
+  "Keyboard quit and force normal state."
+  (interactive)
+  (and evil-mode (evil-force-normal-state))
+  (keyboard-quit))
+
+(define-key evil-normal-state-map   (kbd "C-g") #'evil-keyboard-quit) 
+(define-key evil-motion-state-map   (kbd "C-g") #'evil-keyboard-quit) 
+(define-key evil-insert-state-map   (kbd "C-g") #'evil-keyboard-quit) 
+(define-key evil-window-map         (kbd "C-g") #'evil-keyboard-quit) 
+(define-key evil-operator-state-map (kbd "C-g") #'evil-keyboard-quit)
 
 ;; redo system
 (use-package undo-fu
