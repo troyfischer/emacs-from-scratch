@@ -418,8 +418,15 @@ Package for binding keys when using evil.
 #+end_src
 * Dired
 #+begin_src emacs-lisp
+(defun dired-mode-hook-custom ()
+            (setq dired-deletion-confirmer #'y-or-n-p) ;; change usual yes or no prompt to y or n
+            (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")) ;; hides dotfiles in omit mode
+            (setq dired-open-extensions '(("mkv" . "mpv")
+                                          ("mp4" . "mpv")))
+            (dired-omit-mode 1))
 (use-package dired
   :straight nil
+  :hook ((dired-mode . dired-mode-hook-custom))
   :config
   (my-leader-def 
     "d"   '(:ignore t :which-key "Dired")
@@ -429,7 +436,6 @@ Package for binding keys when using evil.
     "d o" '(dired-omit-mode :which-key "Hide files")))
 
 (with-eval-after-load 'dired
-  ;;(define-key dired-mode-map (kbd "M-p") 'peep-dired)
   (evil-define-key 'normal dired-mode-map (kbd "h") 'dired-up-directory)
   (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
   (evil-define-key 'normal peep-dired-mode-map (kbd "j") 'peep-dired-next-file)
@@ -439,15 +445,6 @@ Package for binding keys when using evil.
 
 ;; Get file icons in dired
 (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-
-;; change usual yes or no prompt to y or n
-(setq dired-deletion-confirmer #'y-or-n-p)
-
-;; With dired-open plugin, you can launch external programs for certain extensions
-;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
-(setq dired-open-extensions '(("mkv" . "mpv")
-                              ("mp4" . "mpv")))
-
 #+end_src
 ** Dired nice to have packages
 #+begin_src emacs-lisp
