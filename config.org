@@ -148,9 +148,8 @@ Straight handles packages. I can do sophisticated stuff like pull directly from 
 #+end_src
 ** Themes
 #+begin_src emacs-lisp
-;; Doom themes
-(use-package doom-themes)
-(load-theme 'doom-xcode t)
+(use-package zenburn-theme)
+(load-theme 'zenburn t)
 
 ;; Doom modeline
 (use-package doom-modeline)
