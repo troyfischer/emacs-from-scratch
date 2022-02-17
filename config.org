@@ -1,5 +1,6 @@
 #+title: Emacs Configuration
 #+author: Troy Fischer
+#+startup: fold
 
 * Straight
 Straight handles packages. I can do sophisticated stuff like pull directly from github or pin a package to a commit hash.
@@ -1261,7 +1262,7 @@ Inc/Dec      _w_/_W_ brightness      _d_/_D_ saturation      _e_/_E_ hue    "
 (use-package vterm
   :config
   (my-leader-def
-    "o v" '(vterm-other-window :which-key "vterm")))
+    "o t" '(vterm-other-window :which-key "Open terminal")))
 #+end_src
 * Bookmarks
 #+begin_src emacs-lisp
