@@ -1001,6 +1001,37 @@ Package for binding keys when using evil.
   (unless (file-remote-p default-directory 'no-identification) ad-do-it))
 #+end_src
 * Language Support
+** Lsp
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :init
+  :hook (python-mode . lsp-deferred)
+        (scala-mode . lsp-deferred)
+        (java-mode . lsp-deferred)
+        (lsp-mode . lsp-enable-which-key-integration) ;; which-key integration
+  :commands lsp lsp-deferred
+  :bind ()
+  :config
+  (setq lsp-prefer-capf t)
+  (my-leader-def
+    "l" '(:ignore t :which-key "Lsp")
+    "l d" '(lsp-find-definition :which-key "Find definition")
+    "l r" '(lsp-rename :which-key "Rename")
+    "l e" '(lsp-execute-code-action :which-key "Execute code action")))
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+
+;; if you are an ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+(use-package flycheck)
+#+end_src
 ** Python
 I always work from python virtual environments.
 #+begin_src emacs-lisp
@@ -1017,42 +1048,42 @@ I always work from python virtual environments.
   (setq pyvenv-post-deactivate-hooks
 	(list (lambda ()
 		(setq python-shell-interpreter "python3")))))
+
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp-deferred))))
+#+end_src
+** Scala
+#+begin_src emacs-lisp
+(use-package scala-mode
+  :interpreter
+    ("scala" . scala-mode))
+(use-package lsp-metals)
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+)
+#+end_src
+** Java
+#+begin_src emacs-lisp
+(use-package lsp-java
+  :config
+  (setq lsp-java-code-generation-hash-code-equals-use-java7objects t)
+  (setq lsp-java-format-settings-url "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml"))
 #+end_src
 ** Groovy
 #+begin_src emacs-lisp
 (use-package groovy-mode)
-#+end_src
-* Lsp
-#+begin_src emacs-lisp
-(use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  ;; (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (python-mode . lsp-deferred)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp lsp-deferred
-  :bind ()
-  :config
-  (setq lsp-prefer-capf t)
-  (my-leader-def
-    "l" '(:ignore t :which-key "Lsp")
-    "l d" '(lsp-find-definition :which-key "Find definition")
-    "l r" '(lsp-rename :which-key "Rename")))
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-
-;; if you are an ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
-(use-package flycheck)
 #+end_src
 ** Company
 #+begin_src emacs-lisp
@@ -1105,13 +1136,9 @@ I always work from python virtual environments.
   (define-key company-active-map (kbd "C-k") #'company-select-previous)
   (define-key company-active-map (kbd "C-j") #'company-select-next))
 #+end_src
-** Python
+** Formatting
 #+begin_src emacs-lisp
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp-deferred))))  ; or lsp-deferred
+(use-package prettier-js)
 #+end_src
 * Treemacs
 [[https://github.com/Alexander-Miller/treemacs][Treemacs]] opens a file tree.
